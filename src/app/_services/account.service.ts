@@ -9,6 +9,11 @@ import { User } from '@app/_models';
 
 @Injectable({ providedIn: 'root' })
 export class AccountService {
+    update: any;
+    delet: any;
+    delete(id: string) {
+        throw new Error('Method not implemented.');
+    }
     private userSubject: BehaviorSubject<User>;
     public user: Observable<User>;
 
@@ -24,8 +29,24 @@ export class AccountService {
         return this.userSubject.value;
     }
 
-    login(username, password) {
-        return this.http.post<User>(`${environment.apiUrl}/users/authenticate`, { username, password })
+    // login(body) {
+    //      return this.http.post<User>('http://localhost:8000/users/authenticate', body)
+    //     // return this.http.post<User>(`${environment.apiUrl}/users/authenticate`, body)
+    //         .pipe(map(user => {
+    //              // store user details and jwt token in local storage to keep user logged in between page refreshes
+    //              localStorage.setItem('user', JSON.stringify(user));
+    //             this.userSubject.next(user);
+    //              return user;
+    //         }));
+    // }
+
+    register(user: User) {
+        return this.http.post('http://127.0.0.1:8000/users/', user);
+    }
+
+
+    login(user.username: User , password: User) {
+        return this.http.post<User>('http://localhost:8000/users/authenticate/',user)
             .pipe(map(user => {
                 // store user details and jwt token in local storage to keep user logged in between page refreshes
                 localStorage.setItem('user', JSON.stringify(user));
@@ -34,6 +55,8 @@ export class AccountService {
             }));
     }
 
+
+
     logout() {
         // remove user from local storage and set current user to null
         localStorage.removeItem('user');
@@ -41,9 +64,7 @@ export class AccountService {
         this.router.navigate(['/account/login']);
     }
 
-    register(user: User) {
-        return this.http.post(`${environment.apiUrl}/users/register`, user);
-    }
+   
 
     getAll() {
         return this.http.get<User[]>(`${environment.apiUrl}/users`);
@@ -53,30 +74,30 @@ export class AccountService {
         return this.http.get<User>(`${environment.apiUrl}/users/${id}`);
     }
 
-    update(id, params) {
-        return this.http.put(`${environment.apiUrl}/users/${id}`, params)
-            .pipe(map(x => {
-                // update stored user if the logged in user updated their own record
-                if (id == this.userValue.id) {
-                    // update local storage
-                    const user = { ...this.userValue, ...params };
-                    localStorage.setItem('user', JSON.stringify(user));
+    // update(id, params) {
+    //     return this.http.put(`${environment.apiUrl}/users/${id}`, params)
+    //         .pipe(map(x => {
+    //             // update stored user if the logged in user updated their own record
+    //             if (id == this.userValue.id) {
+    //                 // update local storage
+    //                 const user = { ...this.userValue, ...params };
+    //                 localStorage.setItem('user', JSON.stringify(user));
 
-                    // publish updated user to subscribers
-                    this.userSubject.next(user);
-                }
-                return x;
-            }));
-    }
+    //                 // publish updated user to subscribers
+    //                 this.userSubject.next(user);
+    //             }
+    //             return x;
+    //         }));
+    // }
 
-    delete(id: string) {
-        return this.http.delete(`${environment.apiUrl}/users/${id}`)
-            .pipe(map(x => {
-                // auto logout if the logged in user deleted their own record
-                if (id == this.userValue.id) {
-                    this.logout();
-                }
-                return x;
-            }));
-    }
+    // delete(id: string) {
+    //     return this.http.delete(`${environment.apiUrl}/users/${id}`)
+    //         .pipe(map(x => {
+    //             // auto logout if the logged in user deleted their own record
+    //             if (id == this.userValue.id) {
+    //                 this.logout();
+    //             }
+    //             return x;
+    //         }));
+    // }
 }
